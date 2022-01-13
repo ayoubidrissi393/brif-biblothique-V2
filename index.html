@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="modal_content">
+    <form class="modal_form">
+        <label id="titre_div">
+            <input id="titre" placeholder="Titre"  type="text">
+            <p id="titre_par"></p>
+        </label>
+
+        <label id="auteur_div">
+        <input id="auteur" placeholder="Auteur" type="text">
+            <p id="auteur_par"></p>
+        </label>
+
+        <label id="email_div">
+            <input id="email" placeholder="Email"  type="text">
+            <p id="email_par"></p>
+        </label>
+
+        <label id="prix_div">
+            <input id="prix" placeholder="Prix"  type="text">
+            <p id="prix_par"></p>
+        </label>
+
+        <label id="date_div">
+        <input id="date" placeholder="date" type="date">
+            <p id="date_par"></p>
+        </label>
+
+        <label id="language_div">
+            <select value="type" id="language">
+                <option disabled selected hidden value>-- Select a language --</option>
+                <option value="Arabic">Arabic</option>
+                <option value="English">English</option>
+                <option value="French">French</option>
+            </select>
+            <p id="language_par"></p>
+        </label>
+
+        <div id="type_div" style="position: relative;">
+            <span>Type:
+            </span>
+            
+                <label><input class="type" type="radio" value="roman" name="type">Roman</label>
+                <label><input class="type" type="radio" value="essay" name="type">Essay</label>
+                <label><input class="type" type="radio" value="comic" name="type">comic book</label>
+
+            <p id="type_par"></p>
+        </div>
+
+        <input type="submit" value="valider" class="btn btn-outline-dark" id="valider_btn">
+    </form>
+</div>
+    <p id="message"></p>
+        <div id="print_div">
+            <table class="table table-dark table-striped" >
+                <thead>
+                    <td>Titre</td>
+                    <td>Auteur</td>
+                    <td>Email</td>
+                    <td>Prix</td>
+                    <td>Date</td>
+                    <td>Langage</td>
+                    <td>Type</td>
+                    <td>Options</td>
+                </thead>
+                <tbody id="table">
+        
+                </tbody>
+            </table>
+        </div>
+         <!-- <input class="btn-print" type="button" value="print" onclick="print_btn()"> -->
+
+        <script>
+            var form_el = document.getElementsByTagName("form")[0];
+            var form_inputs = document.getElementsByTagName("input");
+            var title = document.getElementById("titre");
+            var author = document.getElementById("auteur");
+            var email_aut = document.getElementById("email");
+            var price = document.getElementById("prix");
+            var pub = document.getElementById("date");
+            var lang = document.getElementById("language");
+            var type = document.getElementsByClassName("type");
+            var type_par = document.getElementById("type_par");
+            var max_length = 30;
+            var is_checked = false;
+            var table = document.getElementById("table"); 
+            var message = document.getElementById("message");
+            var print_div = document.getElementById("print_div");
+            var book;
+
+
+
+
+            //constructor 
+            class Books{
+            constructor(titre, auteur, email, prix, date, language, type)
+            {
+                this.titre = titre;
+                this.auteur = auteur;
+                this.email = email;
+                this.prix = prix;
+                this.date = date;
+                this.language = language;
+                this.type = type;
+            }
+            bookDetails(){
+                return `L'ouvrage '${this.titre}' est un '${this.type}' en langage '${this.language}', écrit par '${this.auteur}' et publié le '${this.date}'. Le prix de '${this.titre}' est de '${this.prix}' Dhs.`
+            }
+        }
+        var list_box = [];
+        var temp_list = "";
+        temp_list = JSON.parse(localStorage.getItem("list"));
+        if(temp_list!=null)
+            {
+                for(i=0;i<temp_list.length;i++){
+                    var backup_book = new Books(temp_list[i].titre,temp_list[i].auteur,temp_list[i].email,temp_list[i].prix,temp_list[i].date,temp_list[i].language,temp_list[i].type)
+                    list_box.push(backup_book);
+                }
+            }
+        
+            // pour ajouter en table
+            function fill_table()
+            {
+            for(var i=0;i<list_box.length;i++)
+            {
+            var row = table.insertRow();
+            row.insertCell(0).innerHTML = list_box[i].titre;
+            row.insertCell(1).innerHTML = list_box[i].auteur;
+            row.insertCell(2).innerHTML = list_box[i].email;
+            row.insertCell(3).innerHTML = list_box[i].prix;
+            row.insertCell(4).innerHTML = list_box[i].date;
+            row.insertCell(5).innerHTML = list_box[i].language;
+            row.insertCell(6).innerHTML = "<input class='edit_btn' onclick='edit_row(this)' type='button' value='modifier'>" +
+                "<input class='dlt_btn' onclick='dlt_row(this)' type='button' value='suprimer'>"+
+                "<input class=' print_btn' onclick=' print_btn(this)' type='button' value='imprimer'>";
+            //type
+            row.insertCell(6).innerHTML = list_box[i].type;
+            }
+            }
+            fill_table();
+
+            // pour trie un table 
+            function trier_table(){
+            list_box.sort(function(a,b)
+            {
+                if(a.titre < b.titre)
+                {
+                    return -1;
+                }
+                // else 
+                //     if(a.titre > b.titre)
+                //     {
+                //         return 1;
+                //     }
+                
+                // else
+                // return 1;
+               
+            })
+        }
+
+        // le validation de input 
+        function validate(e) {
+            e.preventDefault();
+            var form_not_valid = 0;
+
+            //basic check
+            for (var i = 0; i < 4; i++) {
+                if (form_inputs[i].value == "") {
+                    form_not_valid++;
+                    form_inputs[i].style.borderColor = "red";
+                    form_inputs[i].nextElementSibling.style.color = "red";
+                    form_inputs[i].nextElementSibling.innerHTML = "please fill this field";
+                }
+                else {
+                    form_inputs[i].style.borderColor = "green"
+                    form_inputs[i].nextElementSibling.style.color = "green";
+                    form_inputs[i].nextElementSibling.innerHTML = "✔";
+                }
+            }
+             //titre check
+             if (titre.value.length > max_length) {
+                form_not_valid++;
+                titre.style.borderColor = "red"
+                titre.nextElementSibling.innerHTML = "max " + max_length;
+                titre.nextElementSibling.style.color = "red";
+            }
+
+            //auteur check
+            if (auteur.value.length > max_length) {
+                form_not_valid++;
+                auteur.style.borderColor = "red";
+                auteur.nextElementSibling.innerHTML = "max " + max_length;
+                auteur.nextElementSibling.style.color = "red";
+            }
+
+            //Email check
+            var email_check =  /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            var email_check2 = /\s/;
+            if(!email_check.test(email_aut.value)){
+                if(email_check2.test(email_aut.value)){
+                }
+                form_not_valid++;
+                email_aut.style.borderColor = "red";
+                email_aut.nextElementSibling.innerHTML = "Invalid email format";
+                email_aut.nextElementSibling.style.color = "red";
+            }
+            else{
+                email_aut.style.borderColor = "green";
+                email_aut.nextElementSibling.style.color = "green";
+                email_aut.nextElementSibling.innerHTML = "✔";
+            }
+              //prix check
+                var prix_check1 = /[a-zA-Z]/;
+                var prix_check2 = /^[0-9]+\.[0-9]{2}$/;
+            if (prix_check1.test(prix.value))
+            {
+                form_not_valid++;
+                prix.style.borderColor = "red";
+                prix.nextElementSibling.innerHTML = "chiffres uniquement";
+                prix.nextElementSibling.style.color = "red";
+            }
+            else if (!prix_check2.test(prix.value)) {
+                prix.style.borderColor = "red";
+                form_not_valid++;
+                prix.nextElementSibling.innerHTML = "invalid prix format";
+                prix.nextElementSibling.style.color = "red";
+            }
+
+            //language check
+            if (lang.value == "") {
+                form_not_valid++;
+                lang.style.borderColor = "red";
+                lang.nextElementSibling.style.color = "red";
+                lang.nextElementSibling.innerHTML = "please select a langage";
+            }
+            else {
+                lang.style.borderColor = "green";
+                lang.nextElementSibling.style.color = "green";
+                lang.nextElementSibling.innerHTML = "✔";
+            }
+
+            //type check
+            for (var i = 0; i < type.length; i++) {
+                if (type[i].checked) {
+                    is_checked = true;
+                    break;
+                }
+                else {
+                    is_checked = false;
+                }
+            }
+            if (is_checked) {
+                type_par.innerHTML = "✔";
+                type_par.style.color = "green";
+            }
+            else {
+                form_not_valid++;
+                type_par.innerHTML = "please select a type!";
+                type_par.style.color = "red";
+            }
+
+
+              //insert row
+              if (form_not_valid == 0) {
+                var temp_cell = "";
+                for (var i = 0; i < type.length; i++) {
+                    if (type[i].checked) {
+                        temp_cell = type[i].value;
+                    }
+                }
+
+                var index = lang.selectedIndex;
+
+                book = new Books(titre.value, auteur.value, email_aut.value, prix.value, pub.value,language.options[index].value, temp_cell)
+                list_box.push(book);
+                message.innerHTML = book.bookDetails();
+                trier_table();
+                localStorage.setItem("list", JSON.stringify(list_box));
+                table.innerHTML = "";
+                fill_table();
+                }
+        }
+
+         // Supprimer function;
+         function dlt_row(r) {
+            
+                var i = r.parentNode.parentNode.rowIndex-1;
+                list_box.splice(i,1);
+                trier_table();
+                localStorage.setItem("list", JSON.stringify(list_box));
+                table.innerHTML = "";
+                fill_table();
+            
+        }
+
+         // modifier function;
+         function edit_row(r) {
+            var i = r.parentNode.parentNode.rowIndex-1;
+            var dlt_disable = r.nextElementSibling;
+            var row = table.rows[i];
+            if (r.value == "modifier") {
+                // Type
+                
+                titre.value = row.cells[0].innerHTML;
+                auteur.value = row.cells[1].innerHTML;
+                email_aut.value = row.cells[2].innerHTML;
+                prix.value = row.cells[3].innerHTML;
+                pub.value = row.cells[4].innerHTML;
+                lang.value = row.cells[5].innerHTML;
+                
+                for (var i = 0; i < type.length; i++) {
+                    if (row.cells[6].innerHTML == type[i].value) 
+                    {
+                        type[i].checked = true;
+                    }
+                }
+                r.value = "Save";
+                dlt_disable.setAttribute("disabled", "true");
+                document.getElementById("valider_btn").setAttribute("disabled", "true");
+            }
+            else {
+                list_box[i].titre = titre.value;
+                list_box[i].auteur = auteur.value;
+                list_box[i].email = email_aut.value;
+                list_box[i].prix = prix.value;
+                list_box[i].date = pub.value;
+                list_box[i].language = lang.value;
+                for (var k = 0; k < type.length; k++) {
+                    if (type[k].checked) {
+                        list_box[i].type = type[k].value;
+                    }
+                }
+                table.innerHTML = "";
+                localStorage.setItem("list", JSON.stringify(list_box));
+                fill_table();
+                r.value = "modifier";
+                dlt_disable.removeAttribute("disabled");
+                document.getElementById("valider_btn").removeAttribute("disabled")
+            }
+        }
+
+        function print_btn(){
+            var temp_div = print_div.innerHTML;
+            var temp_body = document.body.innerHTML;
+            document.body.innerHTML = temp_div;
+            window.print();
+            document.body.innerHTML = temp_body;
+            location.reload();
+        }
+      
+        form_el.addEventListener("submit", validate)
+        </script>
+</body>
+</html>
